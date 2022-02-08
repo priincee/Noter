@@ -12,32 +12,49 @@ struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
 
     @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
+        sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: false)],
         animation: .default)
     private var items: FetchedResults<Item>
-
+    @State var notes : [Note]
+    @State var searchString: String = ""
     var body: some View {
         NavigationView {
             List {
-                ForEach(items) { item in
-                    NavigationLink(destination: Text("Item at \(item.timestamp!, formatter: itemFormatter)")) {
-                        Text(item.timestamp!, formatter: itemFormatter)
+                TextField("Search", text:$searchString)
+                    .textFieldStyle(.roundedBorder)
+                ForEach(notes) { note in
+                    NavigationLink(destination: NoteDetailView(note: note)) {
+                        NoteList(note: note)
+                       // Text(item.timestamp!, formatter: itemFormatter)
                     }
                 }
-                .onDelete(perform: deleteItems)
+                .onDelete(perform: deleteItems)  
             }
-            .toolbar {
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
+            
+            NoteView()
+            //NoteDetailView()
+        }
+        .frame(width: 700.0)
+        .toolbar {
+            ToolbarItem(placement: .navigation) {
+                Button(action: toggleSideBar, label:{
+                    Image(systemName: "sidebar.left")
+                })
+            }
+            ToolbarItem {
+                Button(action: addNote) {
+                    Label("Add Note", systemImage: "square.and.pencil")
                 }
             }
-            Text("Select an item")
         }
     }
+    
+    func toggleSideBar() {
+        NSApp.keyWindow?.firstResponder?.tryToPerform(
+            #selector(NSSplitViewController.toggleSidebar(_:)), with: nil)
+    }
 
-    private func addItem() {
+    private func addNote() {
         withAnimation {
             let newItem = Item(context: viewContext)
             newItem.timestamp = Date()
@@ -78,6 +95,6 @@ private let itemFormatter: DateFormatter = {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+        ContentView(notes: Note.data).environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
     }
 }
