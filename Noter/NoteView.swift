@@ -8,13 +8,15 @@
 import SwiftUI
 
 struct NoteView: View {
+    let note: Note
     var body: some View {
-        Text("TODO: Note View")
+        
+        Text(note.title)
     }
 }
 
 struct NoteView_Previews: PreviewProvider {
     static var previews: some View {
-        NoteView()
+        NoteView(note:Note.data[0])
     }
 }

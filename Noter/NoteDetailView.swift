@@ -8,19 +8,38 @@
 import SwiftUI
 
 struct NoteDetailView: View {
-    var note: Note
+    @Binding var note: Note
+    @State private var data: Note.Data = Note.Data()
     var body: some View {
-        Text(note.title)
-            .font( .headline)
-        Text(note.information)
+            VStack(){
+                TextEditor(text: $note.title)
+                    .font(.headline)
+                    .frame(height: 25)
+                    .cornerRadius(10)
+                    .onDebouncedChange(
+                        of: $note.title,
+                        debounceFor: 2
+                    ) { _ in data = note.data; note.update(from: data); note.timestamp = Date()
+                    }
+                TextEditor(text: $note.information)
+                    .cornerRadius(10)
+                    .lineSpacing(5)
+                    .onDebouncedChange(
+                        of: $note.information,
+                        debounceFor: 1
+                    ) { _ in data = note.data; note.update(from: data); note.timestamp = Date()
+                    }
+                Text("Last Modified on: \(note.timestamp, formatter: itemFormatter)")
+            }
+        .padding()
     }
 }
 
-//struct NoteDetailView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        NoteDetailView().frame(minWidth: 6000, idealWidth: nil, maxWidth: nil, minHeight: nil, idealHeight: nil, maxHeight: nil, alignment: .center)
-//    }
-//}
+private func saveToCloud(s:Binding<Note.Data>, d: Binding<Note>){
+    print(s)
+    print("saved title")
+    
+}
 
 private let itemFormatter: DateFormatter = {
     let formatter = DateFormatter()

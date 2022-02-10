@@ -10,10 +10,10 @@ import SwiftUI
 @main
 struct NoterApp: App {
     let persistenceController = PersistenceController.shared
-
+    @State private var notes = Note.data
     var body: some Scene {
         WindowGroup {
-            ContentView(notes: Note.data)
+            ContentView(notes: $notes)
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
         }
     }

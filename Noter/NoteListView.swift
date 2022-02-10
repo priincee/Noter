@@ -7,6 +7,7 @@
 
 import Foundation
 import  SwiftUI
+import Combine
 
 struct NoteList: View {
     let note: Note
@@ -15,10 +16,12 @@ struct NoteList: View {
             VStack(alignment: .leading){
                 Text(note.title)
                     .font( .headline)
+                    .fixedSize(horizontal: false, vertical: false)
                 Spacer()
                 Text(note.information)
                 .font(.caption)
             }
+            .padding(.trailing, 15)
             HStack{
                 Spacer()
                 Button(action: noteToStickyNote, label:{
@@ -30,10 +33,9 @@ struct NoteList: View {
             }
         }
         .padding(5)
-        
     }
 }
 
-func noteToStickyNote(){
-    
+private func noteToStickyNote(){
+    print("note turned to sticky note")
 }

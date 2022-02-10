@@ -12,11 +12,13 @@ struct Note: Identifiable {
     var id: UUID
     var title: String
     var information: String
+    var timestamp: Date
    
-    init(id: UUID = UUID(), title: String, information: String){
+    init(id: UUID = UUID(), title: String, information: String, timestamp: Date = Date()){
         self.id = id
         self.title = title
         self.information = information
+        self.timestamp = timestamp
     }
 }
 
@@ -45,5 +47,6 @@ extension Note{
     mutating func update(from data: Data) {
           title = data.title
           information = data.information
+          timestamp = Date()
       }
 }

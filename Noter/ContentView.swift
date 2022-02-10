@@ -14,27 +14,34 @@ struct ContentView: View {
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: false)],
         animation: .default)
+    
     private var items: FetchedResults<Item>
-    @State var notes : [Note]
+    @Binding var notes : [Note]
     @State var searchString: String = ""
     var body: some View {
+        let notes = notes.sorted {
+            $0.timestamp > $1.timestamp
+        }
         NavigationView {
             List {
-                TextField("Search", text:$searchString)
-                    .textFieldStyle(.roundedBorder)
+                Text("Notes")
+                    .font( .headline)
+                HStack(spacing: 7){
+                    Image(systemName: "magnifyingglass")
+                        .font(.title3)
+                        .foregroundColor(.gray)
+                    TextField("Search", text:$searchString)
+                        .textFieldStyle(.roundedBorder)
+                }
                 ForEach(notes) { note in
-                    NavigationLink(destination: NoteDetailView(note: note)) {
+                    NavigationLink(destination: NoteDetailView(note: binding(for: note))) {
                         NoteList(note: note)
-                       // Text(item.timestamp!, formatter: itemFormatter)
                     }
                 }
                 .onDelete(perform: deleteItems)  
             }
-            
-            NoteView()
-            //NoteDetailView()
+            NoteDetailView(note: binding(for: notes[0]))
         }
-        .frame(width: 700.0)
         .toolbar {
             ToolbarItem(placement: .navigation) {
                 Button(action: toggleSideBar, label:{
@@ -49,7 +56,14 @@ struct ContentView: View {
         }
     }
     
-    func toggleSideBar() {
+    private func binding(for note: Note) -> Binding<Note>{
+       guard let noteIndex = notes.firstIndex(where : { $0.id == note.id}) else{
+           fatalError("Can't find note in array")
+       }
+       return $notes[noteIndex]
+   }
+
+    private func toggleSideBar() {
         NSApp.keyWindow?.firstResponder?.tryToPerform(
             #selector(NSSplitViewController.toggleSidebar(_:)), with: nil)
     }
@@ -86,15 +100,8 @@ struct ContentView: View {
     }
 }
 
-private let itemFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateStyle = .short
-    formatter.timeStyle = .medium
-    return formatter
-}()
-
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView(notes: Note.data).environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
-    }
-}
+//struct ContentView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        ContentView(notes: Note.data).environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+//    }
+//}

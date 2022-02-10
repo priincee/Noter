@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		A338F42227B30757003B9C75 /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = A338F42127B30757003B9C75 /* Note.swift */; };
 		A338F42427B30F06003B9C75 /* NoteListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A338F42327B30F06003B9C75 /* NoteListView.swift */; };
+		A338F42627B43CF7003B9C75 /* DebounceMod.swift in Sources */ = {isa = PBXBuildFile; fileRef = A338F42527B43CF7003B9C75 /* DebounceMod.swift */; };
 		A3789EDF271313930075CCAE /* NoterApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3789EDE271313930075CCAE /* NoterApp.swift */; };
 		A3789EE1271313930075CCAE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3789EE0271313930075CCAE /* ContentView.swift */; };
 		A3789EE3271313960075CCAE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A3789EE2271313960075CCAE /* Assets.xcassets */; };
@@ -42,6 +43,7 @@
 /* Begin PBXFileReference section */
 		A338F42127B30757003B9C75 /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
 		A338F42327B30F06003B9C75 /* NoteListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteListView.swift; sourceTree = "<group>"; };
+		A338F42527B43CF7003B9C75 /* DebounceMod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebounceMod.swift; sourceTree = "<group>"; };
 		A3789EDB271313930075CCAE /* Noter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Noter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A3789EDE271313930075CCAE /* NoterApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoterApp.swift; sourceTree = "<group>"; };
 		A3789EE0271313930075CCAE /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -119,6 +121,7 @@
 				A3789F1127188D460075CCAE /* NoteDetailView.swift */,
 				A338F42127B30757003B9C75 /* Note.swift */,
 				A338F42327B30F06003B9C75 /* NoteListView.swift */,
+				A338F42527B43CF7003B9C75 /* DebounceMod.swift */,
 			);
 			path = Noter;
 			sourceTree = "<group>";
@@ -286,6 +289,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A3789EE8271313960075CCAE /* Persistence.swift in Sources */,
+				A338F42627B43CF7003B9C75 /* DebounceMod.swift in Sources */,
 				A3789F1027188D1E0075CCAE /* NoteView.swift in Sources */,
 				A338F42427B30F06003B9C75 /* NoteListView.swift in Sources */,
 				A338F42227B30757003B9C75 /* Note.swift in Sources */,
