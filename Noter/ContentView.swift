@@ -8,39 +8,63 @@
 import SwiftUI
 import CoreData
 
-struct ContentView: View {
-    @Environment(\.managedObjectContext) private var viewContext
+extension NSTextField {
+    open override var focusRingType: NSFocusRingType {
+        get { .none }
+        set { }
+    }
+}
 
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: false)],
-        animation: .default)
-    
-    private var items: FetchedResults<Item>
-    @Binding var notes : [Note]
-    @State var searchString: String = ""
+struct ContentView: View {
+    @ObservedObject var noteArray: NoteArray
+    @State private var searchString: String = ""
+    @State private var newNoteData = Note.Data()
+    @State private var selectedNote: Note?
+    @State private var hasFocus = false
+    @State private var isPresentingDeletionConfirmation: Bool = false
     var body: some View {
-        let notes = notes.sorted {
-            $0.timestamp > $1.timestamp
-        }
         NavigationView {
-            List {
-                Text("Notes")
-                    .font( .headline)
-                HStack(spacing: 7){
-                    Image(systemName: "magnifyingglass")
-                        .font(.title3)
-                        .foregroundColor(.gray)
-                    TextField("Search", text:$searchString)
-                        .textFieldStyle(.roundedBorder)
-                }
-                ForEach(notes) { note in
-                    NavigationLink(destination: NoteDetailView(note: binding(for: note))) {
-                        NoteList(note: note)
+            VStack{
+                List(noteArray.notes, id:\.id, selection:$selectedNote){ note in
+                        NoteListView(note: note).tag(note)
                     }
-                }
-                .onDelete(perform: deleteItems)  
             }
-            NoteDetailView(note: binding(for: notes[0]))
+//            List{
+//                Text("Notes").padding(.leading, 60)
+//                    .font( .headline)
+//                ForEach(noteArray.notes.indices, id: \.self) { index in
+//                    NavigationLink(destination: NoteDetailView(note: noteArray.notes[index])) {
+//                        HStack{
+//                            Button(action: {deleteNote(index: index)}, label:{
+//                                Image(systemName: "xmark")
+//                            }) .buttonStyle(PlainButtonStyle())
+//                                .padding(.leading, 0)
+//                                .accessibilityElement(children: .ignore)
+//                                .accessibilityLabel(Text("delete note"))
+//                            NoteListView(note: $noteArray.notes[index])
+//                        }
+//                    }
+//                }
+//            }
+            if noteArray.notes.count == 0 {
+                NoNotesView
+            } else {
+                if selectedNote != nil{
+                    NoteDetailView(note: selectedNote!)
+                }
+            }
+        }
+        .onAppear{
+            if noteArray.notes.count == 0
+            {
+                selectedNote = nil
+            } else{
+                selectedNote = noteArray.notes[0]
+            }
+            
+//            notes = notes.sorted {
+//                $0.timestamp < $1.timestamp
+//            }
         }
         .toolbar {
             ToolbarItem(placement: .navigation) {
@@ -48,20 +72,41 @@ struct ContentView: View {
                     Image(systemName: "sidebar.left")
                 })
             }
+            ToolbarItem{
+                HStack {
+                    Image(systemName: "magnifyingglass")
+                    TextField("Search", text: $searchString, onEditingChanged: { currentlyEditing in
+                        self.hasFocus = currentlyEditing}).textFieldStyle(.plain)
+                }
+                .padding(.top, 5).padding(.bottom, 5).padding(.trailing, 5).padding(.leading, 5)
+                .overlay(RoundedRectangle(cornerRadius: 10).stroke(lineWidth: 1).foregroundColor(Color.gray))
+            }
+                ToolbarItem {
+                    if selectedNote != nil {
+                        Button(action: {isPresentingDeletionConfirmation = true}) {
+                            Label("Delete Note", systemImage: "trash")
+                        }.alert(isPresented: $isPresentingDeletionConfirmation) {
+                            Alert(
+                                title: Text("Are you sure you want to delete"),
+                                message: Text(selectedNote!.title),
+                                primaryButton: .default(
+                                    Text("No"), action: {isPresentingDeletionConfirmation = false}),
+                                secondaryButton: .destructive(
+                                    Text("Yes"),
+                                    action: {deleteNote(note: selectedNote!); isPresentingDeletionConfirmation = false }
+                                )
+                            )
+                        }
+                    }
+                }
+            
             ToolbarItem {
-                Button(action: addNote) {
+                Button(action: {addNote()}) {
                     Label("Add Note", systemImage: "square.and.pencil")
                 }
             }
         }
     }
-    
-    private func binding(for note: Note) -> Binding<Note>{
-       guard let noteIndex = notes.firstIndex(where : { $0.id == note.id}) else{
-           fatalError("Can't find note in array")
-       }
-       return $notes[noteIndex]
-   }
 
     private func toggleSideBar() {
         NSApp.keyWindow?.firstResponder?.tryToPerform(
@@ -69,39 +114,35 @@ struct ContentView: View {
     }
 
     private func addNote() {
-        withAnimation {
-            let newItem = Item(context: viewContext)
-            newItem.timestamp = Date()
-
-            do {
-                try viewContext.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+        print("tried to add")
+        let newNote = Note(title: newNoteData.title, information: newNoteData.information)
+        noteArray.add(note: newNote)
+        selectedNote = newNote
+        newNoteData = Note.Data()
+        noteArray.subscribeToChanges()
+    }
+    
+    func deleteNote(note : Note) {
+        if noteArray.notes.count == 1 {
+                selectedNote = nil
+            } else {
+                if  selectedNote == noteArray.notes[0] {
+                    print("this is note 0")
+                    selectedNote = noteArray.notes[1]
+                }
+                else{
+                    selectedNote = noteArray.notes[0]
+                }
             }
-        }
+        if note.nsWindow != nil {
+            note.nsWindow?.close()
+            }
+            noteArray.remove(note: note)
+    }
+    
+    var NoNotesView: some View {
+        Text("Oops, looks like you have no notes...")
     }
 
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            offsets.map { items[$0] }.forEach(viewContext.delete)
-
-            do {
-                try viewContext.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-            }
-        }
-    }
 }
 
-//struct ContentView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        ContentView(notes: Note.data).environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
-//    }
-//}
