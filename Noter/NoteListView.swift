@@ -14,6 +14,7 @@ struct NoteListView: View {
     @State private var backgroundColour: Color = Color.yellow
     @State private var backgroundImage: String = "empty"
     @ObservedObject var note: Note
+    @ObservedObject var noteArray: NoteArray
     var body: some View{
         ZStack(alignment: .topLeading) {
             VStack(alignment: .leading){
@@ -36,19 +37,9 @@ struct NoteListView: View {
             }
         }
         .padding(5)
-//        .onAppear{
-//            print("made new")
-//            print(note.nsWindow)
-//            if note.nsWindow != nil{
-//                print(note.nsWindow)
-//                windowRef = note.nsWindow
-//                noteToStickyNote(note: note)
-//            }
-//        }
     }
     func noteToStickyNote(note: Note){
-        
-        let titlebarAccessoryView = ToolBar(colour: $backgroundColour, backgroundImage: $backgroundImage).padding([.top, .leading, .trailing], 5)
+        let titlebarAccessoryView = ToolBar(colour: $backgroundColour, backgroundImage: $backgroundImage).padding([.top, .leading, .trailing], 0)
         let accessoryHostingView = NSHostingView(rootView:titlebarAccessoryView)
         accessoryHostingView.frame.size = accessoryHostingView.fittingSize
         let titlebarAccessory = NSTitlebarAccessoryViewController()
@@ -63,10 +54,11 @@ struct NoteListView: View {
                styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
                backing: .buffered, defer: false)
         print("windowRef!")
-        windowRef?.contentView = NSHostingView(rootView: StickyNoteWindow(note: note, backgroundColour: $backgroundColour, backgroundImage: $backgroundImage, windowRef: windowRef!))
-           windowRef?.makeKeyAndOrderFront(nil)
+        windowRef?.contentView = NSHostingView(rootView: StickyNoteWindow(note: note, backgroundColour: $backgroundColour, backgroundImage: $backgroundImage, windowRef: windowRef!, noteArray: noteArray))
+        windowRef?.makeKeyAndOrderFront(nil)
+        windowRef?.standardWindowButton(.miniaturizeButton)!.isHidden = true
+        windowRef?.standardWindowButton(.zoomButton)!.isHidden = true
         windowRef?.isReleasedWhenClosed = false
-        windowRef?.toolbar = NSToolbar()
         windowRef?.addTitlebarAccessoryViewController(titlebarAccessory)
         windowRef = windowRef
    }
@@ -77,40 +69,41 @@ struct NoteListView: View {
         @Binding var backgroundColour: Color
         @Binding var backgroundImage: String
         @State var windowRef: NSWindow
+        @ObservedObject var noteArray: NoteArray
         @State private var data: Note.Data = Note.Data()
         var body: some View
         {
             VStack(){
                 ZStack(alignment: .center){
                     RoundedRectangle(cornerRadius: 5,style: .continuous)
-                        .border(Color.gray, width: 1.5)
+                        .cornerRadius(5)
                         .frame(width: nil, height:25)
                         .foregroundColor(backgroundColour)
                         .opacity(0.7)
                     TextEditor(text: $note.title)
-                        .padding(.top, 3)
+                        .padding(.top, 0.5)
                         .textFieldStyle(PlainTextFieldStyle())
                         .font(.headline)
                         .frame(height: 25)
-                        .cornerRadius(5)
+                        .cornerRadius(4)
                         .onDebouncedChange(
                             of: $note.title,
-                            debounceFor: 2
-                        ) { _ in data = note.data; note.update(from: data); note.timestamp = Date()
+                            debounceFor: 1
+                        ) { _ in data = note.data; note.update(from: data); note.timestamp = Date(); noteArray.updateNote(note: note)
                         }
                 }.background(Image(backgroundImage).resizable(resizingMode: Image.ResizingMode.tile).frame(alignment: .topLeading).edgesIgnoringSafeArea(.all).opacity(0.2))
                 ZStack(alignment: .center){ RoundedRectangle(cornerRadius: 5,style: .continuous)
-                        .border(Color.gray, width: 1.5)
+                        .cornerRadius(5)
                         .foregroundColor(backgroundColour)
                         .opacity(0.7)
                     TextEditor(text: $note.information)
-                        .padding(.top, 3)
-                        .cornerRadius(5)
+                        .padding(.top, 0.5)
+                        .cornerRadius(4)
                         .lineSpacing(5)
                         .onDebouncedChange(
                             of: $note.information,
-                            debounceFor: 2
-                        ) { _ in data = note.data; note.update(from: data); note.timestamp = Date()
+                            debounceFor: 1
+                        ) { _ in data = note.data; note.update(from: data); note.timestamp = Date();  noteArray.updateNote(note: note)
                         }
                 }.background(Image(backgroundImage).resizable(resizingMode: Image.ResizingMode.tile).frame(alignment: .topLeading).edgesIgnoringSafeArea(.all).opacity(0.2))
             }.padding()

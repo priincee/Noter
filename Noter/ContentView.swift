@@ -24,55 +24,30 @@ struct ContentView: View {
     @State private var isPresentingDeletionConfirmation: Bool = false
     var body: some View {
         NavigationView {
-            VStack{
-                List(noteArray.notes, id:\.id, selection:$selectedNote){ note in
-                        NoteListView(note: note).tag(note)
+            VStack {
+                Text("Notes").font(.headline)
+                List(noteArray.notes, id:\.id, selection:$selectedNote) { note in
+                    NoteListView(note: note, noteArray: noteArray).tag(note)
                     }
             }
-//            List{
-//                Text("Notes").padding(.leading, 60)
-//                    .font( .headline)
-//                ForEach(noteArray.notes.indices, id: \.self) { index in
-//                    NavigationLink(destination: NoteDetailView(note: noteArray.notes[index])) {
-//                        HStack{
-//                            Button(action: {deleteNote(index: index)}, label:{
-//                                Image(systemName: "xmark")
-//                            }) .buttonStyle(PlainButtonStyle())
-//                                .padding(.leading, 0)
-//                                .accessibilityElement(children: .ignore)
-//                                .accessibilityLabel(Text("delete note"))
-//                            NoteListView(note: $noteArray.notes[index])
-//                        }
-//                    }
-//                }
-//            }
             if noteArray.notes.count == 0 {
                 NoNotesView
             } else {
-                if selectedNote != nil{
-                    NoteDetailView(note: selectedNote!)
+                if selectedNote != nil {
+                    NoteDetailView(note: selectedNote!, noteArray: noteArray)
                 }
             }
         }
-        .onAppear{
-            if noteArray.notes.count == 0
-            {
-                selectedNote = nil
-            } else{
-                selectedNote = noteArray.notes[0]
-            }
-            
-//            notes = notes.sorted {
-//                $0.timestamp < $1.timestamp
-//            }
+        .onAppear {
+            noteArray.getData(completion: {noteArray.subscribeToChanges(); selectInitNote()})
         }
         .toolbar {
             ToolbarItem(placement: .navigation) {
-                Button(action: toggleSideBar, label:{
+                Button(action: toggleSideBar, label: {
                     Image(systemName: "sidebar.left")
                 })
             }
-            ToolbarItem{
+            ToolbarItem {
                 HStack {
                     Image(systemName: "magnifyingglass")
                     TextField("Search", text: $searchString, onEditingChanged: { currentlyEditing in
@@ -80,6 +55,10 @@ struct ContentView: View {
                 }
                 .padding(.top, 5).padding(.bottom, 5).padding(.trailing, 5).padding(.leading, 5)
                 .overlay(RoundedRectangle(cornerRadius: 10).stroke(lineWidth: 1).foregroundColor(Color.gray))
+            }
+            ToolbarItem {
+                Button(action: {refreshNotes()}) {
+                    Label("Refresh Notes", systemImage: "icloud.and.arrow.down")}
             }
                 ToolbarItem {
                     if selectedNote != nil {
@@ -99,12 +78,20 @@ struct ContentView: View {
                         }
                     }
                 }
-            
             ToolbarItem {
                 Button(action: {addNote()}) {
                     Label("Add Note", systemImage: "square.and.pencil")
                 }
             }
+        }
+    }
+    
+    private func selectInitNote()  {
+        if noteArray.notes.count == 0
+        {
+            selectedNote = nil
+        } else {
+            selectedNote = noteArray.notes[0]
         }
     }
 
@@ -114,12 +101,13 @@ struct ContentView: View {
     }
 
     private func addNote() {
-        print("tried to add")
         let newNote = Note(title: newNoteData.title, information: newNoteData.information)
-        noteArray.add(note: newNote)
-        selectedNote = newNote
+        noteArray.add(note: newNote, completion: { selectedNote = noteArray.notes[0]})
         newNoteData = Note.Data()
-        noteArray.subscribeToChanges()
+    }
+    
+    private func refreshNotes() {
+        noteArray.getData(completion: {noteArray.subscribeToChanges(); selectInitNote()})
     }
     
     func deleteNote(note : Note) {
@@ -127,7 +115,6 @@ struct ContentView: View {
                 selectedNote = nil
             } else {
                 if  selectedNote == noteArray.notes[0] {
-                    print("this is note 0")
                     selectedNote = noteArray.notes[1]
                 }
                 else{
@@ -136,8 +123,8 @@ struct ContentView: View {
             }
         if note.nsWindow != nil {
             note.nsWindow?.close()
-            }
-            noteArray.remove(note: note)
+        }
+        noteArray.remove(note: note)
     }
     
     var NoNotesView: some View {

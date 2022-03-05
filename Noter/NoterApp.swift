@@ -6,11 +6,14 @@
 //
 
 import SwiftUI
+import Firebase
 
 @main
 struct NoterApp: App {
     let persistenceController = PersistenceController.shared
-   
+    init(){
+        FirebaseApp.configure()
+    }
     @StateObject var noteArray = NoteArray()
     var body: some Scene {
         WindowGroup {
@@ -20,4 +23,3 @@ struct NoterApp: App {
         }
     }
 }
-

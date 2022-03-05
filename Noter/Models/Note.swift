@@ -9,7 +9,6 @@ import Foundation
 import SwiftUI
 
 class Note: Identifiable, ObservableObject {
-
     var id: UUID
     @Published var title: String
     @Published var information: String
@@ -51,8 +50,8 @@ extension Note {
     }
 }
 
-extension Note{
-    struct Data{
+extension Note {
+    struct Data {
         var title: String = ""
         var information:  String = ""
         var nsWindow: NSWindow? = nil

@@ -19,7 +19,7 @@ struct ToolBar: View {
             Button(action: {openBackgroundSelection(background: $backgroundImage)}, label:{
                 Image(systemName: "photo")
             }) .buttonStyle(PlainButtonStyle())
-                .padding(.trailing, 100)
+               .padding(.trailing, 100)
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(Text("Change background image"))
         }.padding(.leading,300)
@@ -71,8 +71,10 @@ struct ToolBar: View {
                contentRect: NSRect(x: 0, y: 10, width: 455, height: 150),
                styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
                backing: .buffered, defer: false)
+        windowRef?.standardWindowButton(.miniaturizeButton)!.isHidden = true
+        windowRef?.standardWindowButton(.zoomButton)!.isHidden = true
         windowRef?.contentView = NSHostingView(rootView: ImageSelection(background: background))
-           windowRef?.makeKeyAndOrderFront(nil)
+        windowRef?.makeKeyAndOrderFront(nil)
         windowRef?.isReleasedWhenClosed = false
         windowRef = windowRef
    }

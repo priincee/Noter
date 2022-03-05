@@ -18,50 +18,46 @@ extension NSTextView {
 
 struct NoteDetailView: View {
     @ObservedObject var note: Note
+    @ObservedObject var noteArray: NoteArray
     @State private var data: Note.Data = Note.Data()
     var body: some View {
             VStack(){
                 ZStack(alignment: .center){
                     RoundedRectangle(cornerRadius: 5,style: .continuous)
-                        .border(Color.gray, width: 1.5)
                         .frame(width: nil, height:25)
-                        .foregroundColor(Color.white)
-                        .opacity(0.1)
+                        .cornerRadius(5)
+                        .foregroundColor(Color.gray)
+                        .opacity(0.3)
                     TextEditor(text: $note.title)
-                        .padding(.top, 3)
+                        .padding(.top, 0.5)
                         .textFieldStyle(PlainTextFieldStyle())
                         .font(.headline)
                         .frame(height: 25)
                         .cornerRadius(5)
                         .onDebouncedChange(
                             of: $note.title,
-                            debounceFor: 2
-                        ) { _ in data = note.data; print("changedT"); note.update(from: data); note.timestamp = Date()
+                            debounceFor: 1
+                        ) { _ in data = note.data; note.update(from: data); note.timestamp = Date(); noteArray.updateNote(note: note)
                         }
                 }
-                ZStack(alignment: .center){ RoundedRectangle(cornerRadius: 5,style: .continuous).border(Color.gray, width: 1.5)
-                        .foregroundColor(Color.white)
-                        .opacity(0.1)
-                    TextEditor(text: $note.information)
-                        .padding(.top, 5)
+                ZStack(alignment: .center){ RoundedRectangle(cornerRadius: 5,style: .continuous)
+                        .foregroundColor(Color.gray)
                         .cornerRadius(5)
+                        .opacity(0.3)
+                    TextEditor(text: $note.information)
+                        .padding(.top, 0.5)
+                        .cornerRadius(4)
                         .lineSpacing(5)
                         .onDebouncedChange(
                             of: $note.information,
-                            debounceFor: 2
-                        ) { _ in data = note.data; note.update(from: data); note.timestamp = Date()
+                            debounceFor: 1
+                        ) { _ in data = note.data; note.update(from: data); note.timestamp = Date(); noteArray.updateNote(note: note)
                         }
                 }
-               
                 Text("Last Modified on: \(note.timestamp, formatter: itemFormatter)")
             }
         .padding()
     }
-}
-
-private func saveToCloud(s:Binding<Note.Data>, d: Binding<Note>){
-    print(s)
-    print("saved title")
 }
 
 private let itemFormatter: DateFormatter = {
