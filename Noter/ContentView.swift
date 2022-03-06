@@ -27,7 +27,10 @@ struct ContentView: View {
             VStack {
                 Text("Notes").font(.headline)
                 List(noteArray.notes, id:\.id, selection:$selectedNote) { note in
-                    NoteListView(note: note, noteArray: noteArray).tag(note)
+                    let r = Float(note.colour[0])
+                    let g = Float(note.colour[1])
+                    let b = Float(note.colour[2])
+                    NoteListView(backgroundColour: Color(red:CGFloat(r!), green: CGFloat(g!), blue: CGFloat(b!)), note: note, noteArray: noteArray).tag(note)
                     }
             }
             if noteArray.notes.count == 0 {
@@ -38,6 +41,7 @@ struct ContentView: View {
                 }
             }
         }
+        .navigationTitle("Stick Note")
         .onAppear {
             noteArray.getData(completion: {noteArray.subscribeToChanges(); selectInitNote()})
         }
@@ -58,7 +62,7 @@ struct ContentView: View {
             }
             ToolbarItem {
                 Button(action: {refreshNotes()}) {
-                    Label("Refresh Notes", systemImage: "icloud.and.arrow.down")}
+                    Label("Refresh Notes", systemImage: "arrow.clockwise")}
             }
                 ToolbarItem {
                     if selectedNote != nil {
@@ -101,7 +105,7 @@ struct ContentView: View {
     }
 
     private func addNote() {
-        let newNote = Note(title: newNoteData.title, information: newNoteData.information)
+        let newNote = Note(title: newNoteData.title, information: newNoteData.information, colour: newNoteData.colour)
         noteArray.add(note: newNote, completion: { selectedNote = noteArray.notes[0]})
         newNoteData = Note.Data()
     }

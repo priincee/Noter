@@ -36,6 +36,7 @@ class NoteArray: ObservableObject, Identifiable {
                             return Note(id: UUID(uuidString: doc["id"] as? String ?? "")! ,
                                         title: doc["title"] as? String ?? "",
                                         information: doc["information"] as? String ?? "",
+                                        colour: doc["colour"]  as? [String] ?? ["1.0", "1.0", "0.0"],
                                         timestamp: Date(timeIntervalSince1970: TimeInterval(i!)))
                         }
                         completion()
@@ -66,7 +67,7 @@ class NoteArray: ObservableObject, Identifiable {
             if error == nil {
                 if let snapshot = snapshot {
                         for doc in snapshot.documents {
-                            db.collection("Notes").document(doc.documentID).setData(["title": note.title,"information": note.information,"timestamp": note.timestamp], merge: true)
+                            db.collection("Notes").document(doc.documentID).setData(["title": note.title,"information": note.information,"timestamp": note.timestamp, "colour": note.colour], merge: true)
                         }
                     }
             }

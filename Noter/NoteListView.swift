@@ -11,13 +11,13 @@ import Combine
 
 struct NoteListView: View {
     @State var windowRef: NSWindow?
-    @State private var backgroundColour: Color = Color.yellow
+    @State var backgroundColour: Color
     @State private var backgroundImage: String = "empty"
     @ObservedObject var note: Note
     @ObservedObject var noteArray: NoteArray
     var body: some View{
         ZStack(alignment: .topLeading) {
-            VStack(alignment: .leading){
+            VStack(alignment: .leading) {
                 Text(note.title)
                     .font( .headline)
                     .fixedSize(horizontal: false, vertical: false)
@@ -29,15 +29,21 @@ struct NoteListView: View {
             HStack{
                 Spacer()
                 Button(action: {noteToStickyNote(note: note)}, label:{
-                    Image(systemName: "chevron.up.square")
+                    Image(systemName: "note.text")
                 }) .buttonStyle(PlainButtonStyle())
                     .padding(.trailing, 0)
                     .accessibilityElement(children: .ignore)
                     .accessibilityLabel(Text("note to sticky note"))
             }
         }
-        .padding(5)
+        .padding(2)
+        HStack(){
+            Circle().foregroundColor(backgroundColour).frame(width: 10, height: 10)
+            Spacer()
+            Text("\((note.timestamp).timeAgoDisplay())").font(.caption).foregroundColor(Color.gray)
+        }
     }
+    
     func noteToStickyNote(note: Note){
         let titlebarAccessoryView = ToolBar(colour: $backgroundColour, backgroundImage: $backgroundImage).padding([.top, .leading, .trailing], 0)
         let accessoryHostingView = NSHostingView(rootView:titlebarAccessoryView)
@@ -53,7 +59,6 @@ struct NoteListView: View {
                contentRect: NSRect(x: 0, y: 10, width: 400, height: 400),
                styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
                backing: .buffered, defer: false)
-        print("windowRef!")
         windowRef?.contentView = NSHostingView(rootView: StickyNoteWindow(note: note, backgroundColour: $backgroundColour, backgroundImage: $backgroundImage, windowRef: windowRef!, noteArray: noteArray))
         windowRef?.makeKeyAndOrderFront(nil)
         windowRef?.standardWindowButton(.miniaturizeButton)!.isHidden = true
@@ -62,7 +67,7 @@ struct NoteListView: View {
         windowRef?.addTitlebarAccessoryViewController(titlebarAccessory)
         windowRef = windowRef
    }
-    
+
     struct StickyNoteWindow: View
     {
         @ObservedObject var note: Note
@@ -94,7 +99,9 @@ struct NoteListView: View {
                 }.background(Image(backgroundImage).resizable(resizingMode: Image.ResizingMode.tile).frame(alignment: .topLeading).edgesIgnoringSafeArea(.all).opacity(0.2))
                 ZStack(alignment: .center){ RoundedRectangle(cornerRadius: 5,style: .continuous)
                         .cornerRadius(5)
-                        .foregroundColor(backgroundColour)
+                        .foregroundColor(backgroundColour).onChange(of: backgroundColour) { bg in
+                            print("changed colour");note.updateColourFromPicker(color: backgroundColour);noteArray.updateNote(note: note)
+                        }
                         .opacity(0.7)
                     TextEditor(text: $note.information)
                         .padding(.top, 0.5)
@@ -116,3 +123,31 @@ struct NoteListView: View {
                 }
 }        }
     }
+
+extension Date {
+    func timeAgoDisplay() -> String {
+
+        let calendar = Calendar.current
+        let minuteAgo = calendar.date(byAdding: .minute, value: -1, to: Date())!
+        let hourAgo = calendar.date(byAdding: .hour, value: -1, to: Date())!
+        let dayAgo = calendar.date(byAdding: .day, value: -1, to: Date())!
+        let weekAgo = calendar.date(byAdding: .day, value: -7, to: Date())!
+
+        if minuteAgo < self {
+            let diff = Calendar.current.dateComponents([.second], from: self, to: Date()).second ?? 0
+            return "\(diff) secs ago"
+        } else if hourAgo < self {
+            let diff = Calendar.current.dateComponents([.minute], from: self, to: Date()).minute ?? 0
+            return "\(diff) mins ago"
+        } else if dayAgo < self {
+            let diff = Calendar.current.dateComponents([.hour], from: self, to: Date()).hour ?? 0
+            return "\(diff) hrs ago"
+        } else if weekAgo < self {
+            let diff = Calendar.current.dateComponents([.day], from: self, to: Date()).day ?? 0
+            return "\(diff) days ago"
+        }
+        let diff = Calendar.current.dateComponents([.weekOfYear], from: self, to: Date()).weekOfYear ?? 0
+        return "\(diff) weeks ago"
+    }
+}
+

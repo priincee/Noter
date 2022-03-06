@@ -36,7 +36,7 @@ struct NoteDetailView: View {
                         .cornerRadius(5)
                         .onDebouncedChange(
                             of: $note.title,
-                            debounceFor: 1
+                            debounceFor: 2
                         ) { _ in data = note.data; note.update(from: data); note.timestamp = Date(); noteArray.updateNote(note: note)
                         }
                 }
@@ -50,7 +50,7 @@ struct NoteDetailView: View {
                         .lineSpacing(5)
                         .onDebouncedChange(
                             of: $note.information,
-                            debounceFor: 1
+                            debounceFor: 2
                         ) { _ in data = note.data; note.update(from: data); note.timestamp = Date(); noteArray.updateNote(note: note)
                         }
                 }
