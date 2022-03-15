@@ -11,11 +11,10 @@
 		A338F42427B30F06003B9C75 /* NoteListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A338F42327B30F06003B9C75 /* NoteListView.swift */; };
 		A338F42627B43CF7003B9C75 /* DebounceMod.swift in Sources */ = {isa = PBXBuildFile; fileRef = A338F42527B43CF7003B9C75 /* DebounceMod.swift */; };
 		A338F42927B6B4D5003B9C75 /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A338F42827B6B4D4003B9C75 /* ViewModel.swift */; };
+		A363D80E27DFA94200D10C11 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A3789EE2271313960075CCAE /* Assets.xcassets */; };
 		A3789EDF271313930075CCAE /* NoterApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3789EDE271313930075CCAE /* NoterApp.swift */; };
 		A3789EE1271313930075CCAE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3789EE0271313930075CCAE /* ContentView.swift */; };
-		A3789EE3271313960075CCAE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A3789EE2271313960075CCAE /* Assets.xcassets */; };
 		A3789EE6271313960075CCAE /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A3789EE5271313960075CCAE /* Preview Assets.xcassets */; };
-		A3789EE8271313960075CCAE /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3789EE7271313960075CCAE /* Persistence.swift */; };
 		A3789EEB271313960075CCAE /* Noter.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = A3789EE9271313960075CCAE /* Noter.xcdatamodeld */; };
 		A3789EF6271313970075CCAE /* NoterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3789EF5271313970075CCAE /* NoterTests.swift */; };
 		A3789F00271313970075CCAE /* NoterUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3789EFF271313970075CCAE /* NoterUITests.swift */; };
@@ -50,12 +49,11 @@
 		A338F42327B30F06003B9C75 /* NoteListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteListView.swift; sourceTree = "<group>"; };
 		A338F42527B43CF7003B9C75 /* DebounceMod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebounceMod.swift; sourceTree = "<group>"; };
 		A338F42827B6B4D4003B9C75 /* ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModel.swift; sourceTree = "<group>"; };
-		A3789EDB271313930075CCAE /* Noter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Noter.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A3789EDB271313930075CCAE /* Stick Note.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Stick Note.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A3789EDE271313930075CCAE /* NoterApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoterApp.swift; sourceTree = "<group>"; };
 		A3789EE0271313930075CCAE /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		A3789EE2271313960075CCAE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A3789EE2271313960075CCAE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = Noter/Assets.xcassets; sourceTree = SOURCE_ROOT; };
 		A3789EE5271313960075CCAE /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		A3789EE7271313960075CCAE /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		A3789EEA271313960075CCAE /* Noter.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Noter.xcdatamodel; sourceTree = "<group>"; };
 		A3789EEC271313960075CCAE /* Noter.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Noter.entitlements; sourceTree = "<group>"; };
 		A3789EF1271313970075CCAE /* NoterTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NoterTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -109,7 +107,7 @@
 		A3789EDC271313930075CCAE /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A3789EDB271313930075CCAE /* Noter.app */,
+				A3789EDB271313930075CCAE /* Stick Note.app */,
 				A3789EF1271313970075CCAE /* NoterTests.xctest */,
 				A3789EFB271313970075CCAE /* NoterUITests.xctest */,
 			);
@@ -124,7 +122,6 @@
 				A3789EDE271313930075CCAE /* NoterApp.swift */,
 				A3789EE0271313930075CCAE /* ContentView.swift */,
 				A3789EE2271313960075CCAE /* Assets.xcassets */,
-				A3789EE7271313960075CCAE /* Persistence.swift */,
 				A3789EEC271313960075CCAE /* Noter.entitlements */,
 				A3789EE9271313960075CCAE /* Noter.xcdatamodeld */,
 				A3789EE4271313960075CCAE /* Preview Content */,
@@ -192,7 +189,7 @@
 				A37B620F27CBF02A00212ADC /* FirebaseFirestore */,
 			);
 			productName = Noter;
-			productReference = A3789EDB271313930075CCAE /* Noter.app */;
+			productReference = A3789EDB271313930075CCAE /* Stick Note.app */;
 			productType = "com.apple.product-type.application";
 		};
 		A3789EF0271313970075CCAE /* NoterTests */ = {
@@ -283,7 +280,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A3789EE6271313960075CCAE /* Preview Assets.xcassets in Resources */,
-				A3789EE3271313960075CCAE /* Assets.xcassets in Resources */,
+				A363D80E27DFA94200D10C11 /* Assets.xcassets in Resources */,
 				A37B620B27CBE4BD00212ADC /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -310,7 +307,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				A338F42927B6B4D5003B9C75 /* ViewModel.swift in Sources */,
-				A3789EE8271313960075CCAE /* Persistence.swift in Sources */,
 				A338F42627B43CF7003B9C75 /* DebounceMod.swift in Sources */,
 				A338F42427B30F06003B9C75 /* NoteListView.swift in Sources */,
 				A37B61C927BFDA7C00212ADC /* NewNoteView.swift in Sources */,
@@ -493,7 +489,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.FYP.Noter;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Stick Note";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -521,7 +517,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.FYP.Noter;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Stick Note";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};

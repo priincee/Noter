@@ -7,6 +7,8 @@
 
 import SwiftUI
 import CoreData
+import Firebase
+import FirebaseAuth
 
 extension NSTextField {
     open override var focusRingType: NSFocusRingType {
@@ -15,7 +17,180 @@ extension NSTextField {
     }
 }
 
+class AppViewModel: ObservableObject {
+    let auth = Auth.auth()
+    @Published var signedIn = false
+    var isSignedIn: Bool {
+        return auth.currentUser != nil
+    }
+    
+    func signIn(email: String, password: String) {
+        auth.signIn(withEmail: email, password: password) {[weak self]
+            (result, error) in guard result != nil, error == nil else{
+                return
+            }
+            DispatchQueue.main.async{
+                self?.signedIn = true
+            }
+        }
+    }
+    
+    func signUp(email: String, password: String) {
+        auth.createUser(withEmail: email, password: password) {[weak self]
+            (result, error) in guard result != nil, error == nil else {
+                return
+            }
+            let db = Firestore.firestore()
+            db.collection("Users").document(result!.user.uid).setData([
+                "uid": result!.user.uid
+            ])
+            DispatchQueue.main.async{
+                self?.signedIn = true
+            }
+        }
+    }
+    
+    func signOut() {
+        try? auth.signOut()
+        
+        self.signedIn = false
+    }
+    
+    func currentUserId() -> String {
+        return auth.currentUser!.uid
+    }
+}
+
+struct SignInOptions: View {
+    var body: some View {
+        NavigationView{
+            List{
+                NavigationLink("Sign In", destination: SignInView())
+                Spacer()
+                NavigationLink("Create Account", destination: SignUpView())
+            }
+            VStack{
+                Image("stickNoteLogo").frame(alignment: .topLeading)
+                Text("Welcome to Stick Note👋").font(.system(size: 30))
+                Text("Sign In or Create an account over there to continue").font(.system(size: 20))
+                Text("👈").font(.system(size: 30))
+                Spacer()
+            }
+            
+        }
+    }
+}
+
+struct SignInView: View {
+    @State var email = ""
+    @State var password = ""
+    @EnvironmentObject var appViewModel: AppViewModel
+    var body: some View {
+            VStack {
+                Image("stickNoteLogo").frame(alignment: .topLeading)
+                Text("Sign In").font(.headline)
+                VStack {
+                    ZStack (alignment: .center){
+                        RoundedRectangle(cornerRadius: 5, style: .continuous)
+                            .frame(width: 200, height:30)
+                            .cornerRadius(5)
+                            .foregroundColor(Color.gray)
+                            .opacity(0.3)
+                        TextField("Email Address", text: $email)
+                            .padding(.leading, 3)
+                            .cornerRadius(5)
+                            .textFieldStyle(PlainTextFieldStyle())
+                            .frame(width: 200, height: 30)
+                    }
+                    ZStack (alignment: .center){
+                        RoundedRectangle(cornerRadius: 5, style: .continuous)
+                            .frame(width: 200, height:30)
+                            .cornerRadius(5)
+                            .foregroundColor(Color.gray)
+                            .opacity(0.3)
+                        SecureField("Password", text: $password)
+                            .padding(.leading, 3)
+                            .cornerRadius(5)
+                            .textFieldStyle(PlainTextFieldStyle())
+                            .frame(width: 200, height: 30)
+                    }
+                    Button(action: { guard !email.isEmpty, !password.isEmpty else {
+                        return
+                    }
+                        appViewModel.signIn(email: email, password: password) }, label: {
+                        Text("Sign In")
+                            .cornerRadius(8)
+                    })
+                }
+            }.padding()
+        Spacer()
+        }
+    }
+
+struct SignUpView: View {
+    @State var email = ""
+    @State var password = ""
+    @EnvironmentObject var appViewModel: AppViewModel
+    var body: some View {
+            VStack {
+                Image("stickNoteLogo").frame(alignment: .topLeading)
+                Text("Create Account").font(.headline)
+                VStack {
+                    ZStack (alignment: .center){
+                        RoundedRectangle(cornerRadius: 5, style: .continuous)
+                            .frame(width: 200, height:30)
+                            .cornerRadius(5)
+                            .foregroundColor(Color.gray)
+                            .opacity(0.3)
+                        TextField("Email Address", text: $email)
+                            .padding(.leading, 3)
+                            .cornerRadius(5)
+                            .textFieldStyle(PlainTextFieldStyle())
+                            .frame(width: 200, height: 30)
+                    }
+                    ZStack (alignment: .center){
+                        RoundedRectangle(cornerRadius: 5, style: .continuous)
+                            .frame(width: 200, height:30)
+                            .cornerRadius(5)
+                            .foregroundColor(Color.gray)
+                            .opacity(0.3)
+                        SecureField("Password", text: $password)
+                            .padding(.leading, 3)
+                            .cornerRadius(5)
+                            .textFieldStyle(PlainTextFieldStyle())
+                            .frame(width: 200, height: 30)
+                    }
+                    Button(action: { guard !email.isEmpty, !password.isEmpty else {
+                        return
+                    }
+                        appViewModel.signUp(email: email, password: password) }, label: {
+                        Text("Create Account")
+                            .cornerRadius(8)
+                    })
+                }
+            }.padding()
+            Spacer()
+    }
+}
+
 struct ContentView: View {
+    @EnvironmentObject var appViewModel: AppViewModel
+    @StateObject var noteArray = NoteArray()
+    var body: some View {
+        VStack {
+            if appViewModel.isSignedIn {
+                NoteContentView(noteArray: noteArray)
+            } else {
+                SignInOptions()
+            }
+        }.onAppear{
+            appViewModel.signedIn = appViewModel.isSignedIn
+        }
+    }
+}
+
+struct NoteContentView: View {
+    @EnvironmentObject var appViewModel: AppViewModel
     @ObservedObject var noteArray: NoteArray
     @State private var searchString: String = ""
     @State private var newNoteData = Note.Data()
@@ -27,10 +202,7 @@ struct ContentView: View {
             VStack {
                 Text("Notes").font(.headline)
                 List(noteArray.notes, id:\.id, selection:$selectedNote) { note in
-                    let r = Float(note.colour[0])
-                    let g = Float(note.colour[1])
-                    let b = Float(note.colour[2])
-                    NoteListView(backgroundColour: Color(red:CGFloat(r!), green: CGFloat(g!), blue: CGFloat(b!)), note: note, noteArray: noteArray).tag(note)
+                    NoteListView(note: note, noteArray: noteArray).tag(note)
                     }
             }
             if noteArray.notes.count == 0 {
@@ -43,7 +215,7 @@ struct ContentView: View {
         }
         .navigationTitle("Stick Note")
         .onAppear {
-            noteArray.getData(completion: {noteArray.subscribeToChanges(); selectInitNote()})
+            noteArray.getData(userId: appViewModel.currentUserId(), completion: {noteArray.subscribeToChanges(); selectInitNote()})
         }
         .toolbar {
             ToolbarItem(placement: .navigation) {
@@ -51,15 +223,15 @@ struct ContentView: View {
                     Image(systemName: "sidebar.left")
                 })
             }
-            ToolbarItem {
-                HStack {
-                    Image(systemName: "magnifyingglass")
-                    TextField("Search", text: $searchString, onEditingChanged: { currentlyEditing in
-                        self.hasFocus = currentlyEditing}).textFieldStyle(.plain)
-                }
-                .padding(.top, 5).padding(.bottom, 5).padding(.trailing, 5).padding(.leading, 5)
-                .overlay(RoundedRectangle(cornerRadius: 10).stroke(lineWidth: 1).foregroundColor(Color.gray))
-            }
+//            ToolbarItem {
+//                HStack {
+//                    Image(systemName: "magnifyingglass")
+//                    TextField("Search", text: $searchString, onEditingChanged: { currentlyEditing in
+//                        self.hasFocus = currentlyEditing}).textFieldStyle(.plain)
+//                }
+//                .padding(.top, 5).padding(.bottom, 5).padding(.trailing, 5).padding(.leading, 5)
+//                .overlay(RoundedRectangle(cornerRadius: 10).stroke(lineWidth: 1).foregroundColor(Color.gray))
+//            }
             ToolbarItem {
                 Button(action: {refreshNotes()}) {
                     Label("Refresh Notes", systemImage: "arrow.clockwise")}
@@ -87,6 +259,14 @@ struct ContentView: View {
                     Label("Add Note", systemImage: "square.and.pencil")
                 }
             }
+            ToolbarItem {
+                Menu {
+                    Button(action:{appViewModel.signOut()}){
+                        Label("Sign Out", systemImage:"person")}
+                } label: {
+                    Label("Account", systemImage:"person")
+                }
+            }
         }
     }
     
@@ -106,12 +286,12 @@ struct ContentView: View {
 
     private func addNote() {
         let newNote = Note(title: newNoteData.title, information: newNoteData.information, colour: newNoteData.colour)
-        noteArray.add(note: newNote, completion: { selectedNote = noteArray.notes[0]})
+        noteArray.add(userId: appViewModel.currentUserId(), note: newNote, completion: { selectedNote = noteArray.notes[0]})
         newNoteData = Note.Data()
     }
     
     private func refreshNotes() {
-        noteArray.getData(completion: {noteArray.subscribeToChanges(); selectInitNote()})
+        noteArray.getData(userId: appViewModel.currentUserId(), completion: {noteArray.subscribeToChanges();})
     }
     
     func deleteNote(note : Note) {
@@ -128,7 +308,7 @@ struct ContentView: View {
         if note.nsWindow != nil {
             note.nsWindow?.close()
         }
-        noteArray.remove(note: note)
+        noteArray.remove(userId: appViewModel.currentUserId(),note: note)
     }
     
     var NoNotesView: some View {

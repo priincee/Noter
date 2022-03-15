@@ -10,16 +10,14 @@ import Firebase
 
 @main
 struct NoterApp: App {
-    let persistenceController = PersistenceController.shared
     init(){
         FirebaseApp.configure()
     }
-    @StateObject var noteArray = NoteArray()
     var body: some Scene {
         WindowGroup {
-            ContentView(noteArray: noteArray)
-                .environment(\.managedObjectContext, persistenceController.container.viewContext)
-                .environmentObject(noteArray)
+            let appViewModel = AppViewModel()
+            ContentView()
+                .environmentObject(appViewModel)
         }
     }
 }

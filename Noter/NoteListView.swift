@@ -10,23 +10,18 @@ import  SwiftUI
 import Combine
 
 struct NoteListView: View {
+    @EnvironmentObject var appViewModel: AppViewModel
     @State var windowRef: NSWindow?
-    @State var backgroundColour: Color
+    @State var backgroundColour: Color = Color.yellow
     @State private var backgroundImage: String = "empty"
     @ObservedObject var note: Note
     @ObservedObject var noteArray: NoteArray
     var body: some View{
-        ZStack(alignment: .topLeading) {
-            VStack(alignment: .leading) {
+        VStack {
+            HStack {
                 Text(note.title)
                     .font( .headline)
                     .fixedSize(horizontal: false, vertical: false)
-                Spacer()
-                Text(note.information)
-                .font(.caption)
-            }
-            .padding(.trailing, 15)
-            HStack{
                 Spacer()
                 Button(action: {noteToStickyNote(note: note)}, label:{
                     Image(systemName: "note.text")
@@ -35,15 +30,39 @@ struct NoteListView: View {
                     .accessibilityElement(children: .ignore)
                     .accessibilityLabel(Text("note to sticky note"))
             }
+            HStack {
+                Text(note.information)
+                    .font(.caption)
+                Spacer()
+            }.padding(.top, 1)
+            HStack{
+                Circle().foregroundColor(backgroundColour).frame(width: 10, height: 10)
+                Spacer()
+                Text("\((note.timestamp).timeAgoDisplay())").font(.caption).foregroundColor(Color.gray)
+            }
+            RoundedRectangle(cornerRadius: 0,style: .continuous)
+                .frame(width: nil, height:1).border(Color.gray, width: 2)
         }
-        .padding(2)
-        HStack(){
-            Circle().foregroundColor(backgroundColour).frame(width: 10, height: 10)
-            Spacer()
-            Text("\((note.timestamp).timeAgoDisplay())").font(.caption).foregroundColor(Color.gray)
+        .onChange(of: note.colour) { bg in
+            print("colour changed")
+            print(note.colour)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                let r = Float(note.colour[0])
+                let g = Float(note.colour[1])
+                let b = Float(note.colour[2])
+                print(note.colour)
+                backgroundColour = Color(red:CGFloat(r!), green: CGFloat(g!), blue: CGFloat(b!))
+            }
+            
+        }
+        .onAppear{
+            let r = Float(note.colour[0])
+            let g = Float(note.colour[1])
+            let b = Float(note.colour[2])
+            backgroundColour = Color(red:CGFloat(r!), green: CGFloat(g!), blue: CGFloat(b!))
         }
     }
-    
+
     func noteToStickyNote(note: Note){
         let titlebarAccessoryView = ToolBar(colour: $backgroundColour, backgroundImage: $backgroundImage).padding([.top, .leading, .trailing], 0)
         let accessoryHostingView = NSHostingView(rootView:titlebarAccessoryView)
@@ -52,24 +71,25 @@ struct NoteListView: View {
         titlebarAccessory.layoutAttribute = .top
         titlebarAccessory.view = accessoryHostingView
         if let curWindow = windowRef {
-                   curWindow.makeKeyAndOrderFront(nil)
-                   return
-               }
-           windowRef = NSWindow(
-               contentRect: NSRect(x: 0, y: 10, width: 400, height: 400),
-               styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
-               backing: .buffered, defer: false)
-        windowRef?.contentView = NSHostingView(rootView: StickyNoteWindow(note: note, backgroundColour: $backgroundColour, backgroundImage: $backgroundImage, windowRef: windowRef!, noteArray: noteArray))
+            curWindow.makeKeyAndOrderFront(nil)
+            return
+        }
+        windowRef = NSWindow(
+            contentRect: NSRect(x: 0, y: 10, width: 400, height: 400),
+            styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
+            backing: .buffered, defer: false)
+        windowRef?.contentView = NSHostingView(rootView: StickyNoteWindow(note: note, backgroundColour: $backgroundColour, backgroundImage: $backgroundImage, windowRef: windowRef!, noteArray: noteArray).environmentObject(appViewModel))
         windowRef?.makeKeyAndOrderFront(nil)
         windowRef?.standardWindowButton(.miniaturizeButton)!.isHidden = true
         windowRef?.standardWindowButton(.zoomButton)!.isHidden = true
         windowRef?.isReleasedWhenClosed = false
         windowRef?.addTitlebarAccessoryViewController(titlebarAccessory)
         windowRef = windowRef
-   }
-
+    }
+    
     struct StickyNoteWindow: View
     {
+        @EnvironmentObject var appViewModel: AppViewModel
         @ObservedObject var note: Note
         @Binding var backgroundColour: Color
         @Binding var backgroundImage: String
@@ -78,64 +98,65 @@ struct NoteListView: View {
         @State private var data: Note.Data = Note.Data()
         var body: some View
         {
-            VStack(){
-                ZStack(alignment: .center){
-                    RoundedRectangle(cornerRadius: 5,style: .continuous)
-                        .cornerRadius(5)
-                        .frame(width: nil, height:25)
-                        .foregroundColor(backgroundColour)
-                        .opacity(0.7)
-                    TextEditor(text: $note.title)
-                        .padding(.top, 0.5)
-                        .textFieldStyle(PlainTextFieldStyle())
-                        .font(.headline)
-                        .frame(height: 25)
-                        .cornerRadius(4)
-                        .onDebouncedChange(
-                            of: $note.title,
-                            debounceFor: 1
-                        ) { _ in data = note.data; note.update(from: data); note.timestamp = Date(); noteArray.updateNote(note: note)
-                        }
-                }.background(Image(backgroundImage).resizable(resizingMode: Image.ResizingMode.tile).frame(alignment: .topLeading).edgesIgnoringSafeArea(.all).opacity(0.2))
-                ZStack(alignment: .center){ RoundedRectangle(cornerRadius: 5,style: .continuous)
-                        .cornerRadius(5)
-                        .foregroundColor(backgroundColour).onChange(of: backgroundColour) { bg in
-                            print("changed colour");note.updateColourFromPicker(color: backgroundColour);noteArray.updateNote(note: note)
-                        }
-                        .opacity(0.7)
-                    TextEditor(text: $note.information)
-                        .padding(.top, 0.5)
-                        .cornerRadius(4)
-                        .lineSpacing(5)
-                        .onDebouncedChange(
-                            of: $note.information,
-                            debounceFor: 1
-                        ) { _ in data = note.data; note.update(from: data); note.timestamp = Date();  noteArray.updateNote(note: note)
-                        }
-                }.background(Image(backgroundImage).resizable(resizingMode: Image.ResizingMode.tile).frame(alignment: .topLeading).edgesIgnoringSafeArea(.all).opacity(0.2))
-            }.padding()
-                .onAppear{
-                    print(note)
-                    data = note.data
-                    data.nsWindow = windowRef
-                    print(windowRef)
-                    note.update(from: data)
-                }
-}        }
-    }
+            ZStack{
+                backgroundColour.ignoresSafeArea()
+                VStack(){
+                    ZStack(alignment: .center){
+                        RoundedRectangle(cornerRadius: 5,style: .continuous)
+                            .cornerRadius(5)
+                            .frame(width: nil, height:25)
+                            .foregroundColor(backgroundColour)
+                            .opacity(0.7)
+                        TextEditor(text: $note.title)
+                            .padding(.top, 0.5)
+                            .textFieldStyle(PlainTextFieldStyle())
+                            .font(.headline)
+                            .frame(height: 25)
+                            .cornerRadius(4)
+                            .onDebouncedChange(
+                                of: $note.title,
+                                debounceFor: 1
+                            ) { _ in data = note.data; note.update(from: data); note.timestamp = Date(); noteArray.updateNote(userId: appViewModel.currentUserId(), note: note)
+                            }
+                    }.background(Image(backgroundImage).resizable(resizingMode: Image.ResizingMode.tile).frame(alignment: .topLeading).edgesIgnoringSafeArea(.all).opacity(0.2))
+                    ZStack(alignment: .center){ RoundedRectangle(cornerRadius: 5,style: .continuous)
+                            .cornerRadius(5)
+                            .foregroundColor(backgroundColour).onChange(of: backgroundColour) { bg in
+                                print("changed colour"); note.updateColourFromPicker(color: backgroundColour); noteArray.updateNote(userId: appViewModel.currentUserId(), note: note)
+                            }
+                            .opacity(0.7)
+                        TextEditor(text: $note.information)
+                            .padding(.top, 0.5)
+                            .cornerRadius(4)
+                            .lineSpacing(5)
+                            .onDebouncedChange(
+                                of: $note.information,
+                                debounceFor: 1
+                            ) { _ in data = note.data; note.update(from: data); note.timestamp = Date();  noteArray.updateNote(userId: appViewModel.currentUserId(), note: note)
+                            }
+                    }.background(Image(backgroundImage).resizable(resizingMode: Image.ResizingMode.tile).frame(alignment: .topLeading).edgesIgnoringSafeArea(.all).opacity(0.2))
+                }.padding()
+                    .onAppear{
+                        print(note)
+                        data = note.data
+                        data.nsWindow = windowRef
+                        print(windowRef)
+                        note.update(from: data)
+                    }
+            }
+        }        }
+}
 
 extension Date {
     func timeAgoDisplay() -> String {
-
         let calendar = Calendar.current
         let minuteAgo = calendar.date(byAdding: .minute, value: -1, to: Date())!
         let hourAgo = calendar.date(byAdding: .hour, value: -1, to: Date())!
         let dayAgo = calendar.date(byAdding: .day, value: -1, to: Date())!
         let weekAgo = calendar.date(byAdding: .day, value: -7, to: Date())!
-
+        
         if minuteAgo < self {
-            let diff = Calendar.current.dateComponents([.second], from: self, to: Date()).second ?? 0
-            return "\(diff) secs ago"
+            return "a few seconds ago"
         } else if hourAgo < self {
             let diff = Calendar.current.dateComponents([.minute], from: self, to: Date()).minute ?? 0
             return "\(diff) mins ago"

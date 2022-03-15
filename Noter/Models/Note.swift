@@ -12,7 +12,7 @@ class Note: Identifiable, ObservableObject {
     var id: UUID
     @Published var title: String
     @Published var information: String
-    var colour: [String]
+    @Published var colour: [String]
     var nsWindow: NSWindow?
     @Published var timestamp: Date
    
@@ -63,15 +63,17 @@ extension Note {
     func updateColourFromPicker(color: Color) {
            let colorString = "\(color)"
            let colorArray: [String] = colorString.components(separatedBy: " ")
-            
-        let r: CGFloat = CGFloat(Float(colorArray[3]) ?? 1)
-        let b: CGFloat = CGFloat(Float(colorArray[4]) ?? 1)
-        let g: CGFloat = CGFloat(Float(colorArray[5]) ?? 1)
-        print(r)
-        print(g)
-        print(b)
-        colour[0] = colorArray[3]
-        colour[1] = colorArray[4]
-        colour[2] = colorArray[5]
+        if colorArray.count >= 3 {
+            let r: CGFloat = CGFloat(Float(colorArray[3]) ?? 1)
+            let b: CGFloat = CGFloat(Float(colorArray[4]) ?? 1)
+            let g: CGFloat = CGFloat(Float(colorArray[5]) ?? 1)
+            print(r)
+            print(g)
+            print(b)
+            colour[0] = colorArray[3]
+            colour[1] = colorArray[4]
+            colour[2] = colorArray[5]
+            update(from: self.data)
+        }
        }
 }

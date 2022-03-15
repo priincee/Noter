@@ -25,9 +25,9 @@ class NoteArray: ObservableObject, Identifiable {
              }
      }
     
-    func getData(completion: @escaping ()-> Void) {
+    func getData(userId: String,completion: @escaping ()-> Void) {
         let db = Firestore.firestore()
-        db.collection("Notes").order(by: "timestamp", descending: true).getDocuments { snapshot, error in
+        db.collection("Users").document(userId).collection("Notes").order(by: "timestamp", descending: true).getDocuments { snapshot, error in
             if error == nil {
                 if let snapshot = snapshot {
                     DispatchQueue.main.async {
@@ -48,11 +48,11 @@ class NoteArray: ObservableObject, Identifiable {
         }
     }
     
-    func add(note: Note, completion: @escaping ()-> Void) {
+    func add(userId: String, note: Note, completion: @escaping ()-> Void) {
         let db = Firestore.firestore()
-        db.collection("Notes").addDocument(data: ["id": note.id.uuidString, "title":note.title, "information":note.information, "timestamp":note.timestamp]) { error in
+        db.collection("Users").document(userId).collection("Notes").addDocument(data: ["id": note.id.uuidString, "title":note.title, "information":note.information, "timestamp":note.timestamp]) { error in
             if error == nil {
-                self.getData(completion: { print("i got callled");
+                self.getData(userId: userId, completion: {
                     self.subscribeToChanges(); completion()
                 })
             } else {
@@ -61,22 +61,22 @@ class NoteArray: ObservableObject, Identifiable {
         }
     }
     
-    func updateNote(note: Note) {
+    func updateNote(userId: String, note: Note) {
         let db = Firestore.firestore()
-        db.collection("Notes").whereField("id", isEqualTo: note.id.uuidString).getDocuments { snapshot, error in
+        db.collection("Users").document(userId).collection("Notes").whereField("id", isEqualTo: note.id.uuidString).getDocuments { snapshot, error in
             if error == nil {
                 if let snapshot = snapshot {
                         for doc in snapshot.documents {
-                            db.collection("Notes").document(doc.documentID).setData(["title": note.title,"information": note.information,"timestamp": note.timestamp, "colour": note.colour], merge: true)
+                            db.collection("Users").document(userId).collection("Notes").document(doc.documentID).setData(["title": note.title,"information": note.information,"timestamp": note.timestamp, "colour": note.colour], merge: true)
                         }
                     }
             }
         }
     }
     
-    func remove(note: Note){
+    func remove(userId: String, note: Note){
         let db = Firestore.firestore()
-        db.collection("Notes").whereField("id", isEqualTo: note.id.uuidString).getDocuments { snapshot, error in
+        db.collection("Users").document(userId).collection("Notes").whereField("id", isEqualTo: note.id.uuidString).getDocuments { snapshot, error in
             if error == nil {
                 if let snapshot = snapshot {
                     DispatchQueue.main.async {

@@ -17,6 +17,7 @@ extension NSTextView {
 }
 
 struct NoteDetailView: View {
+    @EnvironmentObject var appViewModel: AppViewModel
     @ObservedObject var note: Note
     @ObservedObject var noteArray: NoteArray
     @State private var data: Note.Data = Note.Data()
@@ -37,7 +38,7 @@ struct NoteDetailView: View {
                         .onDebouncedChange(
                             of: $note.title,
                             debounceFor: 2
-                        ) { _ in data = note.data; note.update(from: data); note.timestamp = Date(); noteArray.updateNote(note: note)
+                        ) { _ in data = note.data; note.update(from: data); note.timestamp = Date(); noteArray.updateNote(userId: appViewModel.currentUserId(), note: note)
                         }
                 }
                 ZStack(alignment: .center){ RoundedRectangle(cornerRadius: 5,style: .continuous)
@@ -51,7 +52,7 @@ struct NoteDetailView: View {
                         .onDebouncedChange(
                             of: $note.information,
                             debounceFor: 2
-                        ) { _ in data = note.data; note.update(from: data); note.timestamp = Date(); noteArray.updateNote(note: note)
+                        ) { _ in data = note.data; note.update(from: data); note.timestamp = Date(); noteArray.updateNote(userId: appViewModel.currentUserId(), note: note)
                         }
                 }
                 Text("Last Modified on: \(note.timestamp, formatter: itemFormatter)")
