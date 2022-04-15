@@ -1,0 +1,84 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family:  sans-serif;
+  background: #d7d7d7
+  /* stick note yellow #fff568, lgiht grey #d7d7d7, dark grey #898989 */
+}
+.center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px;
+  background: #898989;
+  border: 2px solid black;
+  border-radius: 10px;
+}
+.center h1  {
+  text-align: center;
+  padding: 0 0 20px 0;
+  border-bottom: 1px;
+}
+
+.logo {
+  display: flex;
+  justify-content: center;
+}
+
+img {
+  width: 300px;
+}
+
+.center form {
+  padding: 0 40px;
+  box-sizing: border-box;
+}
+
+form .text_field {
+  position: relative;
+  margin: 30px 0;
+}
+.text_field input {
+  width: 100%;
+  padding: 0 5px;
+  height: 40px;
+  font-size: 16px;
+  border: 1px solid black;
+  border-radius: 8px;
+  background: #d7d7d7;
+  outline: none;
+}
+button {
+  align-self: center;
+  width: 103%;
+  height: 50px;
+
+  border: 1px solid;
+  background-color: #d7d7d7;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+button:hover {
+  border-color: #fff568;
+  background-color: #fff568;
+  transition: .5s;
+}
+
+.link {
+  margin: 30px 0;
+  text-align: center;
+  font-size: 16px;
+}
+
+.link a {
+  color: #fff568;
+  text-decoration: none;
+}
+
+.link a:hover {
+  text-decoration: underline;
+}

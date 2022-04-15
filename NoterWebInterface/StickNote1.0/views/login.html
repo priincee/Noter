@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stick Note Sign In</title>
+     <link rel = "shortcut icon" type="image/png"  href = "static/stickNoteLogo.png">
+    <link rel="stylesheet" href="static/subStyle.css" />
+    <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-app.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-auth.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js" defer></script>
+  </head>
+  <body>
+    <div class="center">
+      <section>
+        <div class="logo">
+          <a href="/"><img src="static/stickNoteLogo.png" alt="Stick Note"></a>
+        </div>
+        <form id="login">
+          <div class="text_field">
+            <input type="text" name="login"  placeholder="Email"/>
+          </div>
+          <div class="text_field">
+            <input type="password" name="password" placeholder="Password"/>
+          </div>
+          <button>Sign in</button>
+        </form>
+      </section>
+      <div class="link">
+          Don't have an account? <a href="/signup">Sign Up Here</a>
+      </div>
+    </div>
+
+      <script>
+        window.addEventListener("DOMContentLoaded", () => {
+          const firebaseConfig = {
+            apiKey: "AIzaSyCJes03jPLsf5vx19cT22fvZx4y5YZLH0A",
+            authDomain: "stick-note-6283f.firebaseapp.com",
+            projectId: "stick-note-6283f",
+            storageBucket: "stick-note-6283f.appspot.com",
+            messagingSenderId: "780761022311",
+            appId: "1:780761022311:web:cb310b5e8c967b7b90b9c2"
+         };
+
+         firebase.initializeApp(firebaseConfig);
+
+         firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION);
+
+         document
+           .getElementById("login")
+           .addEventListener("submit", (event) => {
+             event.preventDefault();
+             const login = event.target.login.value;
+             const password = event.target.password.value;
+
+             firebase
+               .auth()
+               .signInWithEmailAndPassword(login, password)
+               .then(({ user }) => {
+                 return user.getIdToken().then((idToken) => {
+                   return fetch("/sessionLogin", {
+                     method: "POST",
+                     headers: {
+                       Accept: "application/json",
+                       "Content-Type": "application/json",
+                       "CSRF-Token": Cookies.get("XSRF-TOKEN"),
+                     },
+                     body: JSON.stringify({"tokenId":idToken, "uid": user.uid})
+                   });
+                 });
+               })
+               .then(() => {
+                 return
+                 //firebase.auth().signOut();
+               })
+               .then(() => {
+                  window.location.assign("/appview");
+               });
+             return false;
+           });
+       });
+      </script>
+  </body>
+</html>
