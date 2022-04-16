@@ -20,7 +20,7 @@ const db = getFirestore()
 
 document.querySelectorAll('.note_editor').forEach((item, i) => {
   item.addEventListener('keyup', debounce( () => {updateSelectedNote()
-}, 1000))
+}, 500))
 })
 
 window.addEventListener("DOMContentLoaded", () => {
@@ -134,7 +134,7 @@ function populateNotes(array) {
     }
   })
 
-   if (selectedNote.id !== "") {selectNote(selectedNote.id)} else {
+   if (selectedNote.id !== "") {return} else {
      selectNote(notes[0].id)
    }
 }
