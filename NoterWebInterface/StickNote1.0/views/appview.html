@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset=utf-8>
+    <link rel="stylesheet" href="static/style.css">
+    <link rel = "shortcut icon" type="image/png"  href = "static/stickNoteLogo.png">
+    <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-app.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-firestore.js" defer></script>
+    <title>Stick Note</title>
+     <!-- <link rel = "shortcut icon" type="image/png"  href = "favicon.png"> -->
+  </head>
+  <body>
+      <div class ="note" id = "app">
+        <div class = "note_noteListContainer">
+          <h2>Notes</h2>
+          <div class="note_noteList">
+          </div>
+        </div>
+        <div class ="note_detailView">
+          <div class ="note_detailViewToolbar">
+            <ul>
+              <li> <div class="dropdown"><button class="dropbtn"><span class="button_icon"><ion-icon name="person-outline"></ion-icon></span></button><div class="dropdown-content"> <a href="/sessionLogout">Sign out</a></div></div></li>
+              <li> <button class="note_add" type="button"><span class="button_icon"><ion-icon name="create-outline"></ion-icon></span></button></li>
+              <li> <button class="note_delete" type="button"><span class="button_icon"><ion-icon name="trash-outline"></ion-icon></span></button></li>
+            </ul>
+          </div>
+          <div class="note_editor">
+            <h2 class="no_notes">Oops looks like you have no notes...</h2>
+            <input type="text" class="note__title" placeholder="Enter a Note title..."/>
+            <textarea class="note__information" placeholder="Enter note information..."></textarea>
+          </div>
+          <div class= "note__lastModified"> </div>
+        </div>
+      </div>
+      <template id="noteListing">
+        <div class="note_noteListItem" dataset-id="" dataset-docId="" dataset-timestamp="" id="">
+            <div class="note_title"> </div>
+            <div class="note_information"></div>
+            <div class="bottomListingBar">
+              <!-- <div class="colour_indication"></div> -->
+              <div class="color-picker-wrapper" id="">
+	               <input type="color" value="" class="color-picker" name="" id"">
+              </div>
+              <div class= "note_lastModified"></div>
+            </div>
+            <span class="line"></span>
+        </div>
+      </template>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.25.1/moment.min.js"></script>
+      <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+      <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+      <script src="static/appview.js" type="module"></script>
+  </body>
+</html>

@@ -1,0 +1,220 @@
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.note {
+    display: flex;
+    height: 100%;
+}
+
+.note * {
+    font-family: sans-serif;
+}
+
+.note_noteListContainer {
+    border-right: 2px solid #dddddd;
+    flex-shrink: 0;
+    overflow-y: auto;
+    padding: 1em;
+    width: 300px;
+}
+
+.notes__add {
+    background: #009578;
+    border: none;
+    border-radius: 7px;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 1.25em;
+    font-weight: bold;
+    margin-bottom: 1em;
+    padding: 0.75em 0;
+    width: 100%;
+}
+
+.notes__add:hover {
+    background: #00af8c;
+}
+
+.note_noteListItem {
+    cursor: pointer;
+    padding: 10px 5px;
+}
+
+.note_lastModified {
+  color:#aaaaaa;
+  font-style: italic;
+  display: inline-flex;
+  font-size: .8em;
+  float: right;
+}
+
+.colour_indication {
+  display: inline-flex;
+  top: 30px;
+  left: 30px;
+  width: 15px;
+  height: 15px;
+  border-radius: 15px;
+  background-color: yellow;
+}
+
+input[type="color"] {
+	opacity: 0;
+	display: block;
+	width: 32px;
+	height: 32px;
+	border: none;
+
+}
+.color-picker-wrapper {
+  display: inline-flex;
+  top: 30px;
+  left: 30px;
+  width: 15px;
+  height: 15px;
+  border-radius: 15px;
+}
+
+.bottomListingBar {
+  padding-top: 5px;
+  padding-left: 10px;
+}
+  /* stick note yellow #fff568, lgiht grey #d7d7d7, dark grey #898989 */
+#selectedNote {
+    background: #d7d7d7;
+    border-radius: 7px;
+}
+
+.note_title {
+    padding: 10px;
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+.note_information {
+    padding: 0 10px;
+    font-size: 0.9em;
+}
+
+.note_detailView {
+    display: flex;
+    flex-direction: column;
+    padding: 0 3em;
+    flex-grow: 1;
+}
+h2 {
+  padding: 0 4em
+}
+
+.note__title,
+.note__information {
+    border-style: none;
+    display: none;
+    padding: 5px;
+    outline: none;
+    border-radius: 5px;
+    border-color: none;
+    background: #d7d7d7;
+    width: 100%;
+}
+.line {
+  border: .5px solid black;
+  display: block;
+}
+
+.note__title {
+    font-size: 2em;
+    font-weight: bold;
+}
+.note__information {
+    flex-grow: 1;
+    font-size: 1.2em;
+    line-height: 1.5;
+    margin-top: 2em;
+    resize: none;
+}
+
+.note_delete, .note_add, .dropbtn  {
+    height: 10px
+    border: none;
+    border-width: 0;
+    outline: none;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    background: none;
+}
+
+.note_delete:hover, .note_add:hover, .dropbtn:hover {
+    background: #898989;
+}
+
+.note_delete:active, .note_add:hover, .dropbtn :active {
+    background: #898989;
+}
+.button_icon {
+  display: inline-flex;
+  outline: none;
+  align-items: center;
+  padding: 0 5px;
+  height: 100;
+  font-size: 1.5em;
+  outline: none;
+}
+
+.note_detailViewToolbar {
+  width: 100%
+}
+
+.note__lastModified {
+  color: black;
+  padding-top: 10px;
+  font-style: italic;
+  text-align: center;
+}
+
+ul {
+
+}
+
+ul li {
+  list-style: none;
+  display: inline-block;
+  line-height: 50px;
+  float: right;
+  padding: 0 10px;
+}
+.no_notes {
+  display: none;
+}
+
+.note_editor{
+display: block;
+  height: 85%;
+}
+textarea {
+  height: 85%;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #898989;
+
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 0 10px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {background-color: #fff568;}
+
+.dropdown:hover .dropdown-content {display: block;}
