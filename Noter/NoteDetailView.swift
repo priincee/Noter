@@ -6,13 +6,23 @@
 //
 
 import SwiftUI
+
 extension NSTextView {
     open override var frame: CGRect {
         didSet {
-            backgroundColor = .clear //<<here clear
+            backgroundColor = .clear
             drawsBackground = true
+            
         }
 
+    }
+}
+
+extension  NSScrollView {
+    open override var frame: CGRect {
+        didSet {
+         autohidesScrollers = true
+        }
     }
 }
 
@@ -21,6 +31,7 @@ struct NoteDetailView: View {
     @ObservedObject var note: Note
     @ObservedObject var noteArray: NoteArray
     @State private var data: Note.Data = Note.Data()
+
     var body: some View {
             VStack(){
                 ZStack(alignment: .center){
@@ -31,6 +42,7 @@ struct NoteDetailView: View {
                         .opacity(0.3)
                     TextEditor(text: $note.title)
                         .padding(.top, 0.5)
+                        .font(.system(size: 15))
                         .textFieldStyle(PlainTextFieldStyle())
                         .font(.headline)
                         .frame(height: 25)
@@ -46,6 +58,7 @@ struct NoteDetailView: View {
                         .cornerRadius(5)
                         .opacity(0.3)
                     TextEditor(text: $note.information)
+                        .font(.system(size: 15))
                         .padding(.top, 0.5)
                         .cornerRadius(4)
                         .lineSpacing(5)

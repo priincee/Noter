@@ -12,10 +12,6 @@ class NoteArray: ObservableObject, Identifiable {
     @Published var notes = [Note]()
     private var c: AnyCancellable?
     
-    init() {
-        
-    }
-    
      func subscribeToChanges() {
          c = notes
              .publisher
@@ -26,7 +22,11 @@ class NoteArray: ObservableObject, Identifiable {
      }
     
     func getData(userId: String,completion: @escaping ()-> Void) {
+        let settings = FirestoreSettings()
+        settings.isPersistenceEnabled = false
+    
         let db = Firestore.firestore()
+        db.settings = settings
         db.collection("Users").document(userId).collection("Notes").order(by: "timestamp", descending: true).getDocuments { snapshot, error in
             if error == nil {
                 if let snapshot = snapshot {

@@ -286,7 +286,7 @@ struct NoteContentView: View {
 
     private func addNote() {
         let newNote = Note(title: newNoteData.title, information: newNoteData.information, colour: newNoteData.colour)
-        noteArray.add(userId: appViewModel.currentUserId(), note: newNote, completion: { selectedNote = noteArray.notes[0]})
+        noteArray.add(userId: appViewModel.currentUserId(), note: newNote, completion: {noteArray.subscribeToChanges(); selectedNote = noteArray.notes[0]})
         newNoteData = Note.Data()
     }
     

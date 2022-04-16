@@ -3,7 +3,6 @@
 //  Noter
 //
 //  Created by Prince Embola on 10/10/2021.
-//
 
 import SwiftUI
 import Firebase

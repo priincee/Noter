@@ -19,24 +19,25 @@ struct ToolBar: View {
             Button(action: {openBackgroundSelection(background: $backgroundImage)}, label:{
                 Image(systemName: "photo")
             }) .buttonStyle(PlainButtonStyle())
-               .padding(.trailing, 100)
+               .padding(.trailing, 50)
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(Text("Change background image"))
-        }.padding(.leading,300)
+        }.padding(.leading,150)
     }
     
     struct ImageSelection: View
     {   @Binding var background: String
-        @State var imageList: [String] = ["empty","circleGreen","cube","iltraingle","multicolourtraingle"]
-        var body: some View
-        {
-            ScrollView(.horizontal) {
-                LazyHStack {
-                    ForEach(imageList, id: \.self) { image in
-                        ImageListing(background: $background, image: image)
-                            }
+        @State var imageList: [String] = ["empty","1","2","3","4", "5", "6", "polygons", "horizontalLines1", "diagonalLines2", "verticallines", "crissCross2", "checkered1"]
+        var columnGrid: [GridItem] = Array(repeating: .init(.flexible(), spacing: 20), count: 4)
+        var body: some View {
+            LazyVGrid (columns: columnGrid, spacing:0){
+                ForEach(imageList, id: \.self) { image in
+                    ImageListing(background: $background, image: image)
+                        .frame(height: 90)
+                        .frame(maxWidth: .infinity)
                 }
             }
+            .padding()
         }
     }
     
@@ -48,6 +49,8 @@ struct ToolBar: View {
         {
             Button(action: {background = image}, label:{
                 Image(image)
+                    .resizable()
+                    .frame(width: 60.0, height: 60.0)
             }) .buttonStyle(PlainButtonStyle())
                 .padding()
                 .background(Color.clear)
@@ -55,8 +58,6 @@ struct ToolBar: View {
                 .overlay(
                     RoundedRectangle(cornerRadius: 4).stroke(Color(.gray), lineWidth: 2)
                 )  
-                .padding(.leading, 5)
-                .padding(.trailing, 5)
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(Text("Select background image"))
         }
